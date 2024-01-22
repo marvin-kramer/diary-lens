@@ -22,9 +22,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
     const {data: videoUrl} = await supabase.storage.from("video").createSignedUrl(diaryEntryData.video_path, 60 * 20)
 
     return (
-        <div className={"max-w-[1200px] mx-auto"}>
+        <div className={"max-w-[1200px] mx-auto p-4"}>
             <AspectRatio ratio={16 / 9} className={"bg-muted rounded-lg overflow-hidden w-full"}>
-                {videoUrl ? <Video controls>
+                {videoUrl ? <Video controls className={"h-full w-full"}>
                     <source src={videoUrl.signedUrl}/>
                 </Video> : <div className={"h-full flex justify-center items-center"}>
                     <p>not-found</p>
