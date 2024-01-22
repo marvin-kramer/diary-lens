@@ -19,7 +19,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
     }
     const diaryEntryData = diaryResponse[0] as Diary
 
-    const {data: videoUrl, error} = await supabase.storage.from("video").createSignedUrl(diaryEntryData.video_path, 60 * 20)
+    const {data: videoUrl} = await supabase.storage.from("video").createSignedUrl(diaryEntryData.video_path, 60 * 20)
 
     return (
         <div className={"max-w-[1200px] mx-auto"}>
