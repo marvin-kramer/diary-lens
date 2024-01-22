@@ -20,8 +20,6 @@ export default function FileUpload({searchParams}: {
             redirect("/upload?message=The video you uploaded is to long.")
         }
 
-        console.log(file.size)
-
         const cookieStore = cookies();
         const supabase = createClient(cookieStore);
         const user = await supabase.auth.getUser()
