@@ -12,7 +12,7 @@ const Page = async () => {
 
     const supabase = createClient(cookies())
 
-    const {data, error} = await supabase.from('diary').select().order('created_at', {ascending: false})
+    const {data} = await supabase.from('diary').select().order('created_at', {ascending: false})
 
     return (
         <div className={"flex flex-wrap gap-3 justify-center p-8"}>

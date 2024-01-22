@@ -1,14 +1,12 @@
 "use client"
 import React, {ReactNode, useState} from 'react';
 import {Skeleton} from "@/components/ui/skeleton";
-import type {ClassValue} from "clsx";
 import {cn} from "@/lib/utils";
 
 const Video = (props: {
     autoPlay?: true;
     children?: ReactNode,
-    classNameVideo?: ClassValue[],
-    classNameSkeleton?: ClassValue[],
+    className?: string,
     controls?: true
 }) => {
     const [isLoaded, setIsLoaded] = useState(true)
@@ -16,10 +14,10 @@ const Video = (props: {
     return (
         <>
             {isLoaded ?
-                <video className={cn("object-cover", props.classNameVideo)} onLoad={() => setIsLoaded(true)} controls={props.controls} autoPlay={props.autoPlay}>
+                <video className={cn("object-cover", props.className)} onLoad={() => setIsLoaded(true)} controls={props.controls} autoPlay={props.autoPlay}>
                     {props.children}
                 </video> :
-                <Skeleton className={cn("h-full w-full", props.classNameSkeleton)}/>
+                <Skeleton className={cn("h-full w-full", props.className)}/>
             }
         </>
     );
