@@ -36,7 +36,7 @@ export default function FileUpload({searchParams}: {
             redirect(`/upload?message=File upload failed (${storageError?.message})`)
         }
 
-        const {error: postgresError} = await supabase.from('diary').insert({video_name: fileName, video_type: file.type})
+        const {error: postgresError} = await supabase.from('diary').insert({video_path: videoPath, video_type: file.type})
 
         if (postgresError) {
             console.log(postgresError)
