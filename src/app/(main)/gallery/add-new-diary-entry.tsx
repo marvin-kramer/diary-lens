@@ -12,6 +12,8 @@ import {
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
+import {sendVideoToHelper} from "@/utils/flask";
+import {Diary} from "@/types/diary";
 
 const ONE_GB = 1073741824
 
@@ -45,16 +47,20 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
             redirect(`/gallery?error=File upload failed`)
         }
 
-        const {error: postgresError} = await supabase.from('diary').insert({
+        const {error: postgresError, data: diaries} = await supabase.from('diary').insert({
             video_path: videoPath,
             video_type: file.type
-        })
+        }).select()
 
-        if (postgresError) {
+        const diaryEntry: Diary | null | undefined = (diaries)?.at(0)
+
+        if (postgresError || !diaryEntry) {
+
             console.log(postgresError)
             redirect("/gallery?error=DB insert failed")
         } else {
-            redirect("/gallery?success=File was successfully uploaded")
+            sendVideoToHelper(formData, diaryEntry.id)
+            redirect(`/gallery/${diaryEntry.id}?success=File was successfully uploaded`)
         }
 
     };
