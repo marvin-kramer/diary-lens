@@ -4,13 +4,12 @@ import {redirect} from "next/navigation";
 import {
     Dialog, DialogClose,
     DialogContent,
-    DialogDescription, DialogFooter,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {sendVideoToHelper} from "@/utils/flask";
 import {Diary} from "@/types/diary";
