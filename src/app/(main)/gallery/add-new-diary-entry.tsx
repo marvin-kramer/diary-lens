@@ -15,7 +15,7 @@ import {Input} from "@/components/ui/input";
 
 const ONE_GB = 1073741824
 
-export default function AddNewDiaryEntry(props: { message: string | undefined }) {
+export default function AddNewDiaryEntry({className}: {className?: string}) {
 
     const handleUpload = async (formData: FormData) => {
         "use server";
@@ -62,7 +62,7 @@ export default function AddNewDiaryEntry(props: { message: string | undefined })
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>Add Diary</Button>
+                <Button className={className}>Add Diary</Button>
             </DialogTrigger>
 
             <DialogContent className="w-[480px]">
