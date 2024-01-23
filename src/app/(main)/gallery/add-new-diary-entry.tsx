@@ -22,11 +22,11 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
 
         const file = formData.get("file");
         if (!file || !(file instanceof File)) {
-            redirect("/gallery?message=No file uploaded")
+            redirect("/gallery?error=No file uploaded")
         } else if (!['video/mp4', 'video/webm'].includes(file.type)) {
-            redirect("/gallery?message=Please upload a video")
+            redirect("/gallery?error=Please upload a video")
         } else if (file.size > ONE_GB) {
-            redirect("/gallery?message=The video you uploaded is to long.")
+            redirect("/gallery?error=The video you uploaded is to long.")
         }
 
         const cookieStore = cookies();
@@ -42,7 +42,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
 
         if (storageError || !uploadData) {
             console.log(storageError)
-            redirect(`/gallery?message=File upload failed (${storageError?.message})`)
+            redirect(`/gallery?error=File upload failed`)
         }
 
         const {error: postgresError} = await supabase.from('diary').insert({
@@ -52,9 +52,9 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
 
         if (postgresError) {
             console.log(postgresError)
-            redirect("/gallery?message=DB insert failed")
+            redirect("/gallery?error=DB insert failed")
         } else {
-            redirect("/gallery")
+            redirect("/gallery?success=File was successfully uploaded")
         }
 
     };
@@ -85,28 +85,3 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
         </Dialog>
     );
 }
-
-
-// function generateThumbnail(videoFile: File): Promise<Buffer> {
-//     return new Promise((resolve, reject) => {
-//         ffmpeg(videoFile.path)
-//             .screenshots({
-//                 timestamps: ['1%'],
-//                 filename: 'thumbnail.jpg',
-//                 folder: '/tmp',
-//                 size: '320x240'
-//             })
-//             .on('end', () => {
-//                 fs.readFile('/tmp/thumbnail.jpg', (err, data) => {
-//                     if (err) {
-//                         reject(err);
-//                     } else {
-//                         resolve(data);
-//                     }
-//                 });
-//             })
-//             .on('error', (err) => {
-//                 reject(err);
-//             });
-//     });
-// }
