@@ -7,16 +7,31 @@ import {AspectRatio} from "@/components/ui/aspect-ratio";
 import Link from "next/link";
 import Video from "@/components/ui/Video";
 import dayjs from "dayjs";
+import {Input} from "@/components/ui/input";
+import {DateFilter} from "@/components/for-page/gallery/date-filter";
+import {Button} from "@/components/ui/button";
+import AddNewDiaryEntry from "@/app/(main)/gallery/new-diary-entry";
 
-const Page = async () => {
+const Page = async ({searchParams}: {
+    searchParams: { message: string };
+}) => {
 
     const supabase = createClient(cookies())
 
     const {data} = await supabase.from('diary').select().order('created_at', {ascending: false})
 
     return (
-        <div className={"flex flex-wrap gap-3 justify-center p-8"}>
-            {(data as Diary[]).map(entry => <DiaryEntryCard key={entry.id} diaryEntry={entry}/>)}
+        <div className={"mx-auto max-w-[1200x] p-8 space-y-8"}>
+            <div className={"mx-auto max-w-[800px] w-full space-y-3"}>
+                <div className={"flex space-x-3"}>
+                    <Input placeholder={"Search"}/>
+                    <AddNewDiaryEntry message={searchParams.message}/>
+                </div>
+                <DateFilter/>
+            </div>
+            <div className={"flex flex-wrap gap-3 justify-center"}>
+                {(data as Diary[]).map(entry => <DiaryEntryCard key={entry.id} diaryEntry={entry}/>)}
+            </div>
         </div>
     );
 };
@@ -27,7 +42,7 @@ async function DiaryEntryCard(props: { diaryEntry: Diary }) {
     const createdAt = dayjs(props.diaryEntry.created_at)
     return (
         <Link href={`/gallery/${props.diaryEntry.id}`}>
-            <Card className={"w-96"} >
+            <Card className={"w-96"}>
                 <CardHeader>
                     <AspectRatio ratio={16 / 9} className={"bg-muted rounded-lg overflow-hidden"}>
                         {data ? <Video>
