@@ -9,48 +9,9 @@ import Link from "next/link";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
 import Video from "@/components/ui/Video";
-import {useSearchParams} from "next/navigation";
-import {useToast} from "@/components/ui/use-toast";
-import {useRouter} from "next/navigation";
 
 const ListWithSearch = (props: { initialData: Diary[] | null }) => {
     const [data, setData] = useState<Diary[] | null>(props.initialData)
-    const searchParams = useSearchParams()
-    const error = searchParams.get("error")
-    const success = searchParams.get("success")
-    const {toast, toasts} = useToast()
-
-    useEffect(() => {
-        console.log(toasts)
-    }, [toasts]);
-
-    useEffect(() => {
-        if (error)
-            toast({
-                title: "Upload faild",
-                description: error,
-                variant: "destructive"
-            })
-
-        if (success)
-            toast({
-                title: 'Upload successful',
-                description: success,
-                variant: 'success'
-            })
-
-        window.history.replaceState(null, '', '/gallery')
-    }, [error, success]);
-
-    // const supabase = createClient()
-
-    // useEffect(() => {
-    //     fetchAndSetData()
-    //     async function fetchAndSetData() {
-    //         const {data} = await supabase.from('diary').select().order('created_at', {ascending: false})
-    //         setData(data)
-    //     }
-    // }, []);
 
     return (
         <div className={"space-y-8"}>

@@ -1,8 +1,7 @@
-import {createClient} from "@/utils/supabase/server";
-import {cookies} from "next/headers";
-import {redirect} from "next/navigation";
+"use client"
+import {createClient} from "@/utils/supabase/client";
 import {
-    Dialog, DialogClose,
+    Dialog,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -13,25 +12,50 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {sendVideoToHelper} from "@/utils/flask";
 import {Diary} from "@/types/diary";
+import {FormEvent, useState} from "react";
+import {useToast} from "@/components/ui/use-toast";
+import {useRouter} from "next/navigation";
 
 const ONE_GB = 1073741824
 
 export default function AddNewDiaryEntry({className}: {className?: string}) {
+    const {toast} = useToast()
+    const [isOpen, setIsOpen] = useState(false)
+    const router = useRouter()
 
-    const handleUpload = async (formData: FormData) => {
-        "use server";
+    const submitHandler = async (target:  FormEvent<HTMLFormElement>) => {
+        target.preventDefault()
+
+        const formData = new FormData(target.currentTarget)
 
         const file = formData.get("file");
+        console.log(file)
         if (!file || !(file instanceof File)) {
-            redirect("/gallery?error=No file uploaded")
+            toast({
+                variant: "destructive",
+                title: "No file selected",
+                description: "Please select a file."
+            })
+            return
         } else if (!['video/mp4', 'video/webm'].includes(file.type)) {
-            redirect("/gallery?error=Please upload a video")
+            toast({
+                variant: "destructive",
+                title: "Wrong filetype",
+                description: "Please select a mp4 or webm file."
+            })
+            return
         } else if (file.size > ONE_GB) {
-            redirect("/gallery?error=The video you uploaded is to long.")
+            toast({
+                variant: "destructive",
+                title: "File to big",
+                description: "The file has to be smaller than 1GB."
+            })
+            return
         }
 
-        const cookieStore = cookies();
-        const supabase = createClient(cookieStore);
+        setIsOpen(false)
+
+        const supabase = createClient();
         const user = await supabase.auth.getUser()
         const session = await supabase.auth.getSession()
 
@@ -44,7 +68,12 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
 
         if (storageError || !uploadData) {
             console.log(storageError)
-            redirect(`/gallery?error=File upload failed`)
+            toast({
+                variant: "destructive",
+                title: "Upload error",
+                description: "The file could not be uploaded to the server. Please try again later."
+            })
+            return
         }
 
         const {error: postgresError, data: diaries} = await supabase.from('diary').insert({
@@ -55,18 +84,19 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
         const diaryEntry: Diary | null | undefined = (diaries)?.at(0)
 
         if (postgresError || !diaryEntry) {
-
-            console.log(postgresError)
-            redirect("/gallery?error=DB insert failed")
+            toast({
+                variant: "destructive",
+                title: "Error while creating",
+                description: "An error occurred while creating the diary entry."
+            })
         } else {
             sendVideoToHelper(formData, diaryEntry.id, session.data.session?.access_token, session.data.session?.refresh_token)
-            redirect(`/gallery/${diaryEntry.id}?success=File was successfully uploaded`)
+            router.push(`/gallery/${diaryEntry.id}`)
         }
-
     };
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button className={className}>Add Diary</Button>
             </DialogTrigger>
@@ -75,7 +105,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
                 <DialogHeader>
                     <DialogTitle>New Diary Entry</DialogTitle>
                 </DialogHeader>
-                <form action={handleUpload} id={'form'}>
+                <form onSubmit={submitHandler} id={'form'}>
                     <Input
                         type="file"
                         id="file"
@@ -83,9 +113,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
                     />
                 </form>
                 <DialogFooter>
-                    <DialogClose asChild>
-                        <Button type="submit" form={'form'}>Upload File</Button>
-                    </DialogClose>
+                    <Button type="submit" form={'form'}>Upload File</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
