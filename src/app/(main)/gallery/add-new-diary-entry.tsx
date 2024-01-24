@@ -88,7 +88,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
                 description: "An error occurred while creating the diary entry."
             })
         } else {
-            sendVideoToHelper(formData, diaryEntry.id, session.data.session?.access_token, session.data.session?.refresh_token)
+            sendVideoToHelper(formData, diaryEntry.id, session.data.session?.access_token)
             router.push(`/gallery/${diaryEntry.id}`)
         }
     };
