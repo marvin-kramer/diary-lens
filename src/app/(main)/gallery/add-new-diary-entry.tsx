@@ -33,6 +33,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
         const cookieStore = cookies();
         const supabase = createClient(cookieStore);
         const user = await supabase.auth.getUser()
+        const session = await supabase.auth.getSession()
 
         const fileName = new Date().toISOString() + '-' + file.name
 
@@ -58,7 +59,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
             console.log(postgresError)
             redirect("/gallery?error=DB insert failed")
         } else {
-            sendVideoToHelper(formData, diaryEntry.id)
+            sendVideoToHelper(formData, diaryEntry.id, session.data.session?.access_token, session.data.session?.refresh_token)
             redirect(`/gallery/${diaryEntry.id}?success=File was successfully uploaded`)
         }
 
