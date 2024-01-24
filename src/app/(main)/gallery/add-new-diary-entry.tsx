@@ -25,12 +25,10 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
 
     const submitHandler = async (target:  FormEvent<HTMLFormElement>) => {
         target.preventDefault()
-
         const formData = new FormData(target.currentTarget)
-
         const file = formData.get("file");
-        console.log(file)
-        if (!file || !(file instanceof File)) {
+
+        if (!file || !(file instanceof File) || file.size === 0) {
             toast({
                 variant: "destructive",
                 title: "No file selected",
