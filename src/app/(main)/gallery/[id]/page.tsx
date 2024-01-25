@@ -3,9 +3,7 @@ import {cookies} from "next/headers";
 import {createClient} from "@/utils/supabase/server";
 import {Diary} from "@/types/diary";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
-import {CardDescription, CardTitle} from "@/components/ui/card";
-import dayjs from "dayjs";
-import DeleteConfirmationDialog from "@/app/(main)/gallery/[id]/delete-confirmation-dialog";
+import DiaryInformation from "@/app/(main)/gallery/[id]/diary-information";
 
 const Page = async ({ params }: { params: { id: string } }) => {
     const cookieStore = cookies();
@@ -30,14 +28,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
                     <p>not-found</p>
                 </div>}
             </AspectRatio>
-            <div className={"px-5 py-4"}>
-                <div className={"flex justify-between"}>
-                    <CardTitle>{diaryEntryData.title ?? 'loading...'}</CardTitle>
-                    <DeleteConfirmationDialog diaryId={diaryEntryData.id}/>
-                </div>
-                <CardDescription>{dayjs(diaryEntryData.created_at).format("DD.MM.YYYY")}</CardDescription>
-                <p className={"mt-6"}>{diaryEntryData.transcription ?? 'loading...'}</p>
-            </div>
+            <DiaryInformation initialDiaryEntry={diaryEntryData}/>
         </div>
     );
 };
