@@ -5,5 +5,6 @@ export interface Diary {
     transcription: string | null
     user_id: string
     video_path: string
-    video_type: string
+    video_type: string,
+    thumbnail_path: string | null
 }
