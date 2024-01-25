@@ -8,7 +8,8 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
-import Video from "@/components/ui/Video";
+import ImageWithLoadingState from "@/components/ui/image-with-loading-state";
+import {Skeleton} from "@/components/ui/skeleton";
 
 const ListWithSearch = (props: { initialData: Diary[] | null }) => {
     const [data, setData] = useState<Diary[] | null>(props.initialData)
@@ -32,12 +33,16 @@ function DiaryEntryCard(props: { diaryEntry: Diary }) {
     const [signedUrl, setSignedUrl] = useState<string | undefined>(undefined)
     const supabase = createClient()
 
+    const hasThumbnail = !!props.diaryEntry.thumbnail_path
+
     useEffect(() => {
         fetchAndSetData()
 
         async function fetchAndSetData() {
-            const {data} = await supabase.storage.from("video").createSignedUrl(props.diaryEntry.video_path, 10)
-            setSignedUrl(data?.signedUrl)
+            if (hasThumbnail) {
+                const {data} = await supabase.storage.from("thumbnail").createSignedUrl(props.diaryEntry.thumbnail_path!!, 10)
+                setSignedUrl(data?.signedUrl)
+            }
         }
     }, []);
 
@@ -47,12 +52,16 @@ function DiaryEntryCard(props: { diaryEntry: Diary }) {
         <Link href={`/gallery/${props.diaryEntry.id}`}>
             <Card className={"w-96"}>
                 <CardHeader>
-                    <AspectRatio ratio={16 / 9} className={"bg-muted rounded-lg overflow-hidden"}>
-                        {signedUrl ? <Video>
-                            <source src={signedUrl}/>
-                        </Video> : <div className={"h-full flex justify-center items-center"}>
-                            <p>not-found</p>
-                        </div>}
+                    <AspectRatio ratio={16 / 9} className={"rounded-lg overflow-hidden"}>
+                        {signedUrl ? (
+                            <ImageWithLoadingState src={signedUrl}/>
+                        ) : hasThumbnail ? (
+                            <Skeleton className={"h-full w-full"}/>
+                        ) : (
+                            <div className={"h-full flex justify-center items-center"}>
+                                <p>No thumbnail found.</p>
+                            </div>
+                        )}
                     </AspectRatio>
                 </CardHeader>
                 <CardContent>

@@ -2,7 +2,6 @@ import React from 'react';
 import {cookies} from "next/headers";
 import {createClient} from "@/utils/supabase/server";
 import {Diary} from "@/types/diary";
-import Video from "@/components/ui/Video";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
 import {CardDescription, CardTitle} from "@/components/ui/card";
 import dayjs from "dayjs";
@@ -25,9 +24,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
     return (
         <div className={"max-w-[1200px] mx-auto p-4"}>
             <AspectRatio ratio={16 / 9} className={"bg-muted rounded-lg overflow-hidden w-full"}>
-                {videoUrl ? <Video controls className={"h-full w-full"}>
+                {videoUrl ? <video controls className={"h-full w-full"}>
                     <source src={videoUrl.signedUrl}/>
-                </Video> : <div className={"h-full flex justify-center items-center"}>
+                </video> : <div className={"h-full flex justify-center items-center"}>
                     <p>not-found</p>
                 </div>}
             </AspectRatio>
