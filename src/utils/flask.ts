@@ -9,12 +9,3 @@ export async function sendVideoToHelper(formData: FormData, diaryId: string, acc
         }
     })
 }
-
-export async function sendFillDiaryRequest(formData: FormData, diaryId: string) {
-    let url = process.env.NEXT_PUBLIC_SERVER_URL + '/api/fill-diary?diary-id=' + diaryId;
-    console.log("sending request to:", url)
-    await fetch(url, {
-        method: 'POST',
-        body: formData,
-    })
-}

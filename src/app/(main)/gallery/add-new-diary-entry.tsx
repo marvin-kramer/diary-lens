@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {sendFillDiaryRequest} from "@/utils/flask";
+import {sendVideoToHelper} from "@/utils/flask";
 import {Diary} from "@/types/diary";
 import {FormEvent, useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
@@ -88,7 +88,7 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
                 description: "An error occurred while creating the diary entry."
             })
         } else {
-            sendFillDiaryRequest(formData, diaryEntry.id)
+            sendVideoToHelper(formData, diaryEntry.id, session.data.session?.access_token)
             router.push(`/gallery/${diaryEntry.id}`)
         }
     };
