@@ -64,8 +64,8 @@ function DiaryEntryCard(props: { diaryEntry: Diary }) {
                         )}
                     </AspectRatio>
                 </CardHeader>
-                <CardContent>
-                    <CardTitle>{props.diaryEntry.title ?? 'loading...'}</CardTitle>
+                <CardContent className={"space-y-1"}>
+                    <CardTitle className={"text-xl leading-tight"}>{props.diaryEntry.title ?? 'loading...'}</CardTitle>
                     <CardDescription>
                         {createdAt.format('DD.MM.YYYY')}
                     </CardDescription>
