@@ -7,4 +7,11 @@ export interface Diary {
     video_path: string
     video_type: string,
     thumbnail_path: string | null
+    tags: Tag[]
+}
+export interface Tag {
+    created_at: string,
+    id: string,
+    user_id: string,
+    name: string
 }

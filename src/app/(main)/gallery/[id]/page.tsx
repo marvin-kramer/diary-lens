@@ -5,17 +5,27 @@ import {Diary} from "@/types/diary";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
 import DiaryInformation from "@/app/(main)/gallery/[id]/diary-information";
 
-const Page = async ({ params }: { params: { id: string } }) => {
+const Page = async ({params}: { params: { id: string } }) => {
     const cookieStore = cookies();
     const supabase = createClient(cookieStore)
-    const {data: diaryResponse} = await supabase.from('diary').select().eq("id", params.id)
+    const {data: diaryResponse} = await supabase.from('diary').select(`
+  created_at,
+  id,
+  title,
+  transcription,
+  user_id,
+  video_path,
+  video_type,
+  thumbnail_path,
+  tag ( id, created_at, user_id, name ) 
+`).eq("id", params.id)
 
     if (!diaryResponse) return <p>an error happened</p>
 
     if (diaryResponse.length === 0 || diaryResponse.length > 1) {
         return <p>multiple or more than one entries were found</p>
     }
-    const diaryEntryData = diaryResponse[0] as Diary
+    const diaryEntryData = diaryResponse.map(entry => ({...entry, tags: entry.tag}))[0] as Diary
 
     const {data: videoUrl} = await supabase.storage.from("video").createSignedUrl(diaryEntryData.video_path, 60 * 20)
 
