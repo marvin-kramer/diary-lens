@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import {Diary} from "@/types/diary";
 import {REALTIME_POSTGRES_CHANGES_LISTEN_EVENT} from "@supabase/realtime-js";
 import {createClient} from "@/utils/supabase/client";
-import {Badge} from "@/components/ui/badge";
+import TagSelect from "@/components/ui/tag-select";
 
 const DiaryInformation = ({initialDiaryEntry}: {initialDiaryEntry: Diary}) => {
     const [diaryEntry, setDiaryEntry] = useState(initialDiaryEntry)
@@ -36,11 +36,7 @@ const DiaryInformation = ({initialDiaryEntry}: {initialDiaryEntry: Diary}) => {
                 </div>
                 <DeleteConfirmationDialog diaryId={diaryEntry.id} className={"row-span-2 w-fit"}/>
             </div>
-            <div className={"flex gap-2"}>
-                {diaryEntry.tags.map(tag => (
-                    <Badge id={tag.id} key={tag.id}>{tag.name}</Badge>
-                ))}
-            </div>
+            <TagSelect initialSelectedTag={initialDiaryEntry.tags} diary_id={diaryEntry.id}/>
             <p className={""}>{diaryEntry.transcription ?? 'loading...'}</p>
         </div>
     );
