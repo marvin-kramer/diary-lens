@@ -5,7 +5,7 @@ import {Badge} from "@/components/ui/badge";
 import {cn} from "@/lib/utils";
 import {Command as CommandPrimitive} from "cmdk"
 import {
-    CommandDialog,
+    Command, CommandEmpty,
     CommandGroup,
     CommandItem,
     CommandList,
@@ -18,6 +18,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {Dialog, DialogContent} from "@/components/ui/dialog";
 
 const TagSelect = ({initialSelectedTag, diary_id}: { initialSelectedTag: Tag[], diary_id: string }) => {
     const supabase = createClient()
@@ -25,16 +26,6 @@ const TagSelect = ({initialSelectedTag, diary_id}: { initialSelectedTag: Tag[], 
     const [currentlySelectedTags, setCurrentlySelectedTags] = useState(initialSelectedTag)
     const [currentInputValue, setCurrentInputValue] = useState("")
     const [userTags, setUserTags] = useState<Tag[]>([])
-
-    useEffect(() => {
-        setUserTagData()
-    }, [inputActive]);
-
-    async function setUserTagData() {
-        const {data} = await supabase.from("tag").select()
-        if (data) setUserTags(data as Tag[])
-        else setUserTags([])
-    }
 
     async function setSelectedTagData() {
         const {data, error} = await supabase.from("diary_tag").select(`
@@ -50,7 +41,6 @@ const TagSelect = ({initialSelectedTag, diary_id}: { initialSelectedTag: Tag[], 
         setCurrentInputValue("")
         const {error} = await supabase.from("diary_tag").upsert({diary_id: diary_id, tag_id: tag.id})
         if (error) console.log(error)
-        setUserTagData()
         setSelectedTagData()
     }
 
@@ -70,10 +60,19 @@ const TagSelect = ({initialSelectedTag, diary_id}: { initialSelectedTag: Tag[], 
 
     async function deleteTag(tag: Tag) {
         const {error} = await supabase.from("tag").delete().eq("id", tag.id)
-        setUserTagData()
+        searchUserTags()
         setSelectedTagData()
     }
 
+    useEffect(() => {
+        searchUserTags()
+    }, [currentInputValue]);
+
+    async function searchUserTags() {
+        const {data} = await supabase.from("tag").select().ilike("name", `%${currentInputValue.toLowerCase()}%`).limit(50)
+        if (data) setUserTags(data as Tag[])
+        else setUserTags([])
+    }
 
     return (
         <>
@@ -86,41 +85,58 @@ const TagSelect = ({initialSelectedTag, diary_id}: { initialSelectedTag: Tag[], 
                 )) : <p className={"text-muted-foreground"}>Add tags to your diary...</p>}
             </div>
 
-            <CommandDialog open={inputActive} onOpenChange={setInputActive}>
-                <div className={"flex flex-wrap gap-2 items-center border-b p-3 pr-11"}>
-                    {currentlySelectedTags.map(tag => (
-                        <Badge key={tag.id} className={"w-fit"}>{tag.name}</Badge>
-                    ))}
-                    <CommandPrimitive.Input
-                        onKeyDown={(event) => checkForBackKey(event)}
-                        onValueChange={setCurrentInputValue}
-                        value={currentInputValue}
-                        className={"!h-fit min-w-4 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"}
-                    />
-                </div>
-                <CommandList onSelect={(event) => console.log(event)}>
-                    <CommandGroup heading="Suggestions">
-                        {userTags.map(tag => (
-                            <CommandItem
-                                key={tag.id}
-                                onSelect={() => addTagToDiary(tag)}
-                                className={"group"}
-                            >
-                                <span className={"w-full overflow-hidden text-ellipsis text-nowrap"}>{tag.name}</span>
-                                <DeleteDialog tag={tag} onDelete={deleteTag}/>
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                    {currentInputValue.trim().length > 0 &&
-                        <CommandGroup heading="Neu">
-                            <CommandItem className={"flex gap-2"} onSelect={() => createNewTag(currentInputValue.trim())} value={currentInputValue.trim()}>
-                                <PlusCircle/>
-                                <span className={"w-full overflow-hidden text-nowrap text-ellipsis"}>{currentInputValue.trim()}</span>
-                            </CommandItem>
-                        </CommandGroup>
-                    }
-                </CommandList>
-            </CommandDialog>
+            <Dialog open={inputActive} onOpenChange={setInputActive}>
+                <DialogContent className="overflow-hidden p-0 shadow-lg">
+                    <Command
+                        shouldFilter={false}
+                        className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
+                    >
+                        <div className={"flex flex-wrap gap-2 items-center border-b p-3 pr-11"}>
+                            {currentlySelectedTags.map(tag => (
+                                <Badge key={tag.id} className={"w-fit"}>{tag.name}</Badge>
+                            ))}
+                            <CommandPrimitive.Input
+                                onKeyDown={(event) => checkForBackKey(event)}
+                                onValueChange={setCurrentInputValue}
+                                value={currentInputValue}
+                                placeholder={currentlySelectedTags.length === 0 ? 'Add tags to your diary...' : ''}
+                                className={"!h-fit min-w-4 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"}
+                            />
+                        </div>
+                        <CommandList onSelect={(event) => console.log(event)}>
+                            {userTags.length > 0 &&
+                                <CommandGroup heading="Suggestions">
+                                    {userTags.map(tag => (
+                                        <CommandItem
+                                            key={tag.id}
+                                            onSelect={() => addTagToDiary(tag)}
+                                            className={"group"}
+                                        >
+                                            <span
+                                                className={"w-full overflow-hidden text-ellipsis text-nowrap"}>{tag.name}</span>
+                                            <DeleteDialog tag={tag} onDelete={deleteTag}/>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            }
+                            {currentInputValue.trim().length > 0 &&
+                                <CommandGroup heading="Neu">
+                                    <CommandItem className={"flex gap-2"}
+                                                 onSelect={() => createNewTag(currentInputValue.trim())}
+                                                 value={currentInputValue}>
+                                        <PlusCircle/>
+                                        <span
+                                            className={"w-full overflow-hidden text-nowrap text-ellipsis"}>{currentInputValue}</span>
+                                    </CommandItem>
+                                </CommandGroup>
+                            }
+                            { currentInputValue.trim().length === 0 && userTags.length === 0 &&
+                                <CommandEmpty>Start with tags with adding your first tag.</CommandEmpty>
+                            }
+                        </CommandList>
+                    </Command>
+                </DialogContent>
+            </Dialog>
         </>
     );
 };
@@ -158,13 +174,6 @@ const DeleteDialog = ({onDelete, tag}: { tag: Tag, onDelete: (tag: Tag) => void 
             </AlertDialog>
         </>
     )
-}
-
-function contains(tags: Tag[], name: string): boolean {
-    const foundTag = tags.find(value => value.name === name)
-    console.log(foundTag)
-    console.log(name)
-    return !!foundTag
 }
 
 export default TagSelect;
