@@ -11,7 +11,7 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import {createClient} from "@/utils/supabase/client";
-import {PlusCircle, Trash2} from "lucide-react";
+import {PlusCircle, Trash2, X} from "lucide-react";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -93,7 +93,10 @@ const TagSelect = ({initialSelectedTag, diary_id}: { initialSelectedTag: Tag[], 
                     >
                         <div className={"flex flex-wrap gap-2 items-center border-b p-3 pr-11"}>
                             {currentlySelectedTags.map(tag => (
-                                <Badge key={tag.id} className={"w-fit"}>{tag.name}</Badge>
+                                <Badge key={tag.id} className={"w-fit flex"}>
+                                    {tag.name}
+                                    <X size={18} className={"hover:cursor-pointer"}/>
+                                </Badge>
                             ))}
                             <CommandPrimitive.Input
                                 onKeyDown={(event) => checkForBackKey(event)}
