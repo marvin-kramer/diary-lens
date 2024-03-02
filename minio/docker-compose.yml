@@ -27,3 +27,4 @@ services:
     depends_on:
       - tailscale
     network_mode: service:tailscale
+    restart: unless-stopped
