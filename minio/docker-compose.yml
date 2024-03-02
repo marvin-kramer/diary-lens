@@ -1,15 +1,29 @@
 version: "3.8"
 
 services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: tailscale
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - ./tailscale/state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: unless-stopped
+
   minio:
     image: quay.io/minio/minio
     container_name: minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     volumes:
       - ./minio-data:/data
     environment:
       MINIO_ROOT_USER: ${MINIO_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     command: server /data --console-address ":9001"
+    depends_on:
+      - tailscale
+    network_mode: service:tailscale
