@@ -1,5 +1,5 @@
 "use client"
-import {createClient} from "@/utils/supabase/client";
+import {useCreateClient} from "@/utils/supabase/client";
 import {
     Dialog,
     DialogContent,
@@ -22,12 +22,13 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
     const {toast} = useToast()
     const [isOpen, setIsOpen] = useState(false)
     const router = useRouter()
+    const supabase = useCreateClient();
 
     const submitHandler = async (target:  FormEvent<HTMLFormElement>) => {
         target.preventDefault()
         const formData = new FormData(target.currentTarget)
-        const file = formData.get("file");
 
+        const file = formData.get("file");
         if (!file || !(file instanceof File) || file.size === 0) {
             toast({
                 variant: "destructive",
@@ -49,11 +50,10 @@ export default function AddNewDiaryEntry({className}: {className?: string}) {
                 description: "The file has to be smaller than 1GB."
             })
             return
-        }
 
+        }
         setIsOpen(false)
 
-        const supabase = createClient();
         const user = await supabase.auth.getUser()
         const session = await supabase.auth.getSession()
 

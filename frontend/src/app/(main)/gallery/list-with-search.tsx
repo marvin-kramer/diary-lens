@@ -1,6 +1,6 @@
 'use client'
 import React, {useEffect, useState} from 'react';
-import {createClient} from "@/utils/supabase/client";
+import {useCreateClient} from "@/utils/supabase/client";
 import {Diary} from "@/types/diary";
 import {Input} from "@/components/ui/input";
 import {DateFilter} from "@/components/for-page/gallery/date-filter";
@@ -31,7 +31,7 @@ const ListWithSearch = (props: { initialData: Diary[] | null }) => {
 
 function DiaryEntryCard(props: { diaryEntry: Diary }) {
     const [signedUrl, setSignedUrl] = useState<string | undefined>(undefined)
-    const supabase = createClient()
+    const supabase = useCreateClient()
 
     const hasThumbnail = !!props.diaryEntry.thumbnail_path
 

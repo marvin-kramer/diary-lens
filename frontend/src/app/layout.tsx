@@ -4,6 +4,7 @@ import "./globals.css";
 import {ThemeProvider} from "@/components/providers/theme-provider";
 import {Toaster} from "@/components/ui/toaster";
 import {cn} from "@/lib/utils";
+import SupabaseAccessProvider from "@/components/providers/supabase-access-provider";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -26,8 +27,10 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
         >
-            {children}
-            <Toaster />
+            <SupabaseAccessProvider>
+                {children}
+                <Toaster/>
+            </SupabaseAccessProvider>
         </ThemeProvider>
         </body>
         </html>

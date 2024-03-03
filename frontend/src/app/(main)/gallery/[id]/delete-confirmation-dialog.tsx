@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import {Button} from "@/components/ui/button";
-import {createClient} from "@/utils/supabase/client";
+import {useCreateClient} from "@/utils/supabase/client";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -16,9 +16,9 @@ import {Diary} from "@/types/diary";
 const DeleteConfirmationDialog = ({className, diaryId}: { className?: string, diaryId: string }) => {
     const {toast} = useToast()
     const router = useRouter()
+    const supabase = useCreateClient();
 
     async function handleDeletion() {
-        const supabase = createClient()
         const {data} = await supabase.from("diary").select().eq("id", diaryId)
         const removedDiaryEntry = data!![0] as Diary
 

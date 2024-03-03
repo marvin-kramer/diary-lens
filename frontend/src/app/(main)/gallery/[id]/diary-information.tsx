@@ -6,11 +6,11 @@ import DeleteConfirmationDialog from "@/app/(main)/gallery/[id]/delete-confirmat
 import dayjs from "dayjs";
 import {Diary} from "@/types/diary";
 import {REALTIME_POSTGRES_CHANGES_LISTEN_EVENT} from "@supabase/realtime-js";
-import {createClient} from "@/utils/supabase/client";
+import {useCreateClient} from "@/utils/supabase/client";
 
 const DiaryInformation = ({initialDiaryEntry}: {initialDiaryEntry: Diary}) => {
     const [diaryEntry, setDiaryEntry] = useState(initialDiaryEntry)
-    const supabase = createClient()
+    const supabase = useCreateClient()
 
     supabase.channel("update-listener")
         .on(

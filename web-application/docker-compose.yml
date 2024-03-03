@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  flask:
+    image: ghcr.io/marvin-kramer/diary-lens/backend:latest
+    environment:
+      FLASK_APP: app
+      FLASK_ENV: production
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SUPABASE_URL: ${SUPABASE_URL}
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/marvin-kramer/diary-lens/frontend:latest
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      NEXT_PUBLIC_SERVER_URL: ${FRONTEND_URL}
+      NEXT_PUBLIC_FLASK_SERVER_URL: http://flask:5000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
