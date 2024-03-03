@@ -13,8 +13,8 @@ services:
   frontend:
     image: ghcr.io/marvin-kramer/diary-lens/frontend:latest
     environment:
-      NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
       NEXT_PUBLIC_SERVER_URL: ${FRONTEND_URL}
       NEXT_PUBLIC_FLASK_SERVER_URL: http://flask:5000
     ports:
